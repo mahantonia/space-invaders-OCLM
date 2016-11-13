@@ -27,11 +27,13 @@ PRINTA_OBJETO	MACRO	MATRIZ, COR, XI, YI, LARGURA, TOTAL
 
 	ENDM
 .DATA
-MSG 	DB	0AH,0AH,0AH,0AH,0AH,0AH,0AH,0AH,0AH,0DH,'     ','Bem vindo ao Space Invaders$',0AH,0DH
+MSG 	DB	0AH,0AH,0DH,'     ','Bem vindo ao Space Invaders$',0AH,0DH
 
-MSG1	DB	0AH,0DH,'  ','Pressione Espaco para comecar o jogo',0AH,0DH,'$'
+MSG1	DB	0AH,0AH,0AH,0AH,0AH,,0AH,0AH,0DH,'  ','Pressione Espaco para comecar o jogo',0AH,0DH,'$'
 
-MSG3 	DB 	'SCORE:  $'
+MSG2	DB	0AH,0AH,0AH,'Instrucao: ',0AH,0AH,0AH,0DH, 'Utilize "a" e "d" para movimentar a nave', 0AH,0AH,0AH,0DH, 'Espaco para atirar',0AH,0AH,0AH,0DH, 'Esc para sair do jogo $'
+
+MSG3	DB	'        $'
 
 BLOCO_1010	DB 	1,1,1,1,1,1,1,1,1,1
 		DB 	1,1,1,1,1,1,1,1,1,1
@@ -71,12 +73,12 @@ CORACAO3	DB	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 	DB	0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0
 
 
-;SCORE	DB	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-;	DB	0,1,1,1,1,0,0,1,1,1,0,0,1,1,0,0,1,1,1,0,0,1,1,1,1,1
-;	DB	1,0,0,0,0,0,1,0,0,0,0,1,0,0,1,0,1,0,0,1,0,1,0,0,0,0
-;	DB	0,1,1,1,0,0,1,0,0,0,0,1,0,0,1,0,1,1,1,0,0,1,1,1,1,0
-;	DB	0,0,0,0,1,0,1,0,0,0,0,1,0,0,1,0,1,0,0,1,0,1,0,0,0,0
-;	DB	1,1,1,1,0,0,0,1,1,1,0,0,1,1,0,0,1,0,0,1,0,1,1,1,1,1
+SCORE	DB	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+	DB	0,1,1,1,1,0,0,1,1,1,0,0,1,1,0,0,1,1,1,0,0,1,1,1,1,1
+	DB	1,0,0,0,0,0,1,0,0,0,0,1,0,0,1,0,1,0,0,1,0,1,0,0,0,0
+	DB	0,1,1,1,0,0,1,0,0,0,0,1,0,0,1,0,1,1,1,0,0,1,1,1,1,0
+	DB	0,0,0,0,1,0,1,0,0,0,0,1,0,0,1,0,1,0,0,1,0,1,0,0,0,0
+	DB	1,1,1,1,0,0,0,1,1,1,0,0,1,1,0,0,1,0,0,1,0,1,1,1,1,1
 	;PRINTA_OBJETO	SCORE, 15, X, Y, 26, 156
 
 GORDO	DB	0,0,0,0,1,1,1,1,0,0,0,0
@@ -238,10 +240,17 @@ INICIOMENU:
 	MOV 	AH,9
 	INT 	21h
 
+		
+	LEA 	DX,MSG2
+	MOV 	AH,9
+	INT 	21H
 
 	LEA 	DX,MSG1 	;Le mensagem informando o usuario que precisa pressionar o espaço para começar o jogo
 	MOV 	AH,9
 	INT 	21h
+	
+
+	
 
 	MOV 	AH,1
 	INT 	21h
@@ -258,10 +267,11 @@ MAIN	ENDP;fim do programa---------------------------------------------------
 INICIO_GAME	PROC
 
 INICIO_GAME:
+
 	CALL	PRINTA_TUDO
-	CALL 	SCORE_SOMA
 	;CALL	LIMPA_TUDO
 
+	
 	MOV 	AX, 0100h
 	INT	16h
 	JZ	NAO_SAI
@@ -446,12 +456,12 @@ PRINTA_MATRIZ_AUX		PROC;MATRIZ PARA PRINTAR O QUE ESTIVER NA MATRIZ LOGICA
 	MOV	DX,Y
 
 	CMP	[SI], 2
-	JNE	FOWARD2
+	JNE	FOWARD1
 	PRINTA_OBJETO	ALIEN, 15, CX, DX, 11, 88
-;FOWARD1:
-	;CMP	[SI],21
-	;JNE	FOWARD2
-	;PRINTA_OBJETO	SCORE, 15,CX,DX, 26, 156
+FOWARD1:
+	CMP	[SI],21
+	JNE	FOWARD2
+	PRINTA_OBJETO	SCORE, 15,CX,DX, 26, 156
 
 FOWARD2:
 	CMP	[SI], 33
@@ -515,7 +525,7 @@ SCORE_SOMA	PROC
 	LEA 	DX,MSG3
 	MOV 	AH,9
 	INT		21h
-	
+
 	POP		DX
 
 	CMP 	DX,1
